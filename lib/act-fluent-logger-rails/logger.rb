@@ -68,12 +68,20 @@ module ActFluentLoggerRails
 
     def flush
       return if @messages.empty?
-      messages = if @messages_type == :string
-                   @messages.join("\n")
-                 else
-                   @messages
-                 end
-      @map[:messages] = messages
+      if @messages_type == :json
+        JSON.parse( @messages.join() ).each do |key, value|
+          @map[ key ] = value
+        end
+
+      else
+        messages = if @messages_type == :string
+                     @messages.join("\n")
+                   else
+                     @messages
+                   end
+        @map[:messages] = messages
+
+      end
       @map[:level] = format_severity(@severity)
       @log_tags.each do |k, v|
         @map[k] = case v
