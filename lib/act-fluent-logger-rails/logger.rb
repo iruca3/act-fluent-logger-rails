@@ -68,7 +68,8 @@ module ActFluentLoggerRails
 
     def flush
       return if @messages.empty?
-      if @messages_type == :json
+      level = format_severity(@severity)
+      if @messages_type == :json && [ 'FATAL', 'ERROR' ].index( level.to_s ).nil?
         JSON.parse( @messages.join() ).each do |key, value|
           @map[ key ] = value
         end
@@ -82,7 +83,7 @@ module ActFluentLoggerRails
         @map[:messages] = messages
 
       end
-      @map[:level] = format_severity(@severity)
+      @map[:level] = level
       @log_tags.each do |k, v|
         @map[k] = case v
                   when Proc
