@@ -69,10 +69,11 @@ module ActFluentLoggerRails
     def flush
       return if @messages.empty?
       level = format_severity(@severity)
-      if @messages_type == :json && [ 'FATAL', 'ERROR' ].index( level.to_s ).nil?
-        JSON.parse( @messages.join() ).each do |key, value|
+      if @messages_type == :json
+        JSON.parse( @messages[0] ).each do |key, value|
           @map[ key ] = value
         end
+        @map[:messages] = @messages[1..-1] if @messages.size > 1
 
       else
         messages = if @messages_type == :string
