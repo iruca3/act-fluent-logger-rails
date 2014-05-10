@@ -70,8 +70,14 @@ module ActFluentLoggerRails
       return if @messages.empty?
       level = format_severity(@severity)
       if @messages_type == :json
-        JSON.parse( @messages[0] ).each do |key, value|
-          @map[ key ] = value
+        begin
+          JSON.parse( @messages[0] ).each do |key, value|
+            @map[ key ] = value
+          end
+
+        rescue
+          @map[:json_parse_error] = @messages[0]
+
         end
         @map[:messages] = @messages[1..-1] if @messages.size > 1
 
